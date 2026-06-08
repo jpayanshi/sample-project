@@ -30,7 +30,7 @@ export function Navbar() {
     <header className="sticky top-0 z-40 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
         <Link href="/" className="text-xl font-bold tracking-tight text-gray-900">
-          THREADS
+          Why label?
         </Link>
 
         <nav className="hidden gap-8 sm:flex">

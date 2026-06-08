@@ -9,8 +9,8 @@ import { CartDrawer } from '@/components/CartDrawer';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Threads — Clothing Store',
-  description: 'Premium clothing delivered to your door.',
+  title: 'Why label?',
+  description: "Can't even the most luxurious label match quality. Just want to sell clothes with original threads not with plastic.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
