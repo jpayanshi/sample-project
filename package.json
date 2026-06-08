@@ -1,0 +1,14 @@
+{
+  "name": "clothing-ecommerce",
+  "private": true,
+  "workspaces": ["backend", "frontend"],
+  "scripts": {
+    "dev:backend": "yarn workspace backend dev",
+    "dev:frontend": "yarn workspace frontend dev",
+    "build:backend": "yarn workspace backend build",
+    "build:frontend": "yarn workspace frontend build",
+    "db:migrate": "yarn workspace backend db:migrate",
+    "db:generate": "yarn workspace backend db:generate",
+    "db:studio": "yarn workspace backend db:studio"
+  }
+}

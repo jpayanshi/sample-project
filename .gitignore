@@ -1,0 +1,14 @@
+node_modules/
+frontend/public/images/products/
+frontend/public/images/placeholder.jpg
+dist/
+.env
+.env.local
+.next/
+*.log
+.DS_Store
+coverage/
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
