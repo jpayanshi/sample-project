@@ -1,14 +1,22 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { productsApi } from '@/lib/api';
+import { authApi, productsApi } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import type { Product } from '@/types';
 
 export default function AdminProductsPage() {
+  const router = useRouter();
   const queryClient = useQueryClient();
+
+  const { data: authData, isLoading: authLoading } = useQuery({
+    queryKey: ['me'],
+    queryFn: authApi.me,
+    retry: false,
+  });
 
   const { data, isLoading } = useQuery<{ products: Product[] }>({
     queryKey: ['admin-products'],
@@ -19,6 +27,10 @@ export default function AdminProductsPage() {
     mutationFn: productsApi.delete,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-products'] }),
   });
+
+  if (authLoading) return <div className="py-20 text-center">Loading…</div>;
+  if (!authData?.user) { router.push('/auth/login'); return null; }
+  if (authData.user.role !== 'ADMIN') { router.push('/'); return null; }
 
   const products = data?.products ?? [];
 

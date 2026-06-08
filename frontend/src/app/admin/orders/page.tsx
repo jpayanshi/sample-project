@@ -1,9 +1,10 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { adminApi } from '@/lib/api';
+import { adminApi, authApi } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
+import { useRouter } from 'next/navigation';
 import type { Order, OrderStatus } from '@/types';
 
 const STATUSES: OrderStatus[] = ['PENDING', 'PAID', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
@@ -17,12 +18,23 @@ const STATUS_COLORS: Record<OrderStatus, string> = {
 };
 
 export default function AdminOrdersPage() {
+  const router = useRouter();
   const queryClient = useQueryClient();
+
+  const { data: authData, isLoading: authLoading } = useQuery({
+    queryKey: ['me'],
+    queryFn: authApi.me,
+    retry: false,
+  });
 
   const { data, isLoading } = useQuery<{ orders: Order[] }>({
     queryKey: ['admin-orders'],
     queryFn: adminApi.listOrders,
   });
+
+  if (authLoading) return <div className="py-20 text-center">Loading…</div>;
+  if (!authData?.user) { router.push('/auth/login'); return null; }
+  if (authData.user.role !== 'ADMIN') { router.push('/'); return null; }
 
   const updateMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) =>

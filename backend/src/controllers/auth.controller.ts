@@ -52,18 +52,35 @@ export async function login(req: Request, res: Response) {
 }
 
 export async function logout(_req: Request, res: Response) {
-  res.clearCookie('token');
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+  });
   res.json({ message: 'Logged out' });
 }
 
 export async function me(req: Request, res: Response) {
   const user = await prisma.user.findUnique({
     where: { id: req.user!.userId },
-    select: { id: true, name: true, email: true, role: true, createdAt: true },
+    select: { id: true, name: true, email: true, phone: true, role: true, createdAt: true },
   });
   if (!user) {
     res.status(404).json({ error: 'User not found' });
     return;
   }
+  res.json({ user });
+}
+
+export async function updateProfile(req: Request, res: Response) {
+  const { name, phone } = req.body as { name?: string; phone?: string };
+  const user = await prisma.user.update({
+    where: { id: req.user!.userId },
+    data: {
+      ...(name !== undefined && { name: name.trim() }),
+      ...(phone !== undefined && { phone: phone.trim() || null }),
+    },
+    select: { id: true, name: true, email: true, phone: true, role: true, createdAt: true },
+  });
   res.json({ user });
 }

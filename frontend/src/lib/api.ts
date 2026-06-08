@@ -21,6 +21,16 @@ export const authApi = {
     api.post('/api/auth/login', data).then((r) => r.data),
   logout: () => api.post('/api/auth/logout').then((r) => r.data),
   me: () => api.get('/api/auth/me').then((r) => r.data),
+  updateProfile: (data: { name?: string; phone?: string }) =>
+    api.put('/api/auth/profile', data).then((r) => r.data),
+};
+
+// Addresses
+export const addressApi = {
+  list: () => api.get('/api/addresses').then((r) => r.data),
+  create: (data: { line1: string; line2?: string; city: string; postcode: string; country: string }) =>
+    api.post('/api/addresses', data).then((r) => r.data),
+  delete: (id: string) => api.delete(`/api/addresses/${id}`).then((r) => r.data),
 };
 
 // Products

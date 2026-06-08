@@ -11,6 +11,7 @@ import cartRoutes from './routes/cart';
 import orderRoutes from './routes/orders';
 import paymentRoutes from './routes/payments';
 import adminRoutes from './routes/admin';
+import addressRoutes from './routes/addresses';
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/addresses', addressRoutes);
 
 app.use(errorHandler);
 
