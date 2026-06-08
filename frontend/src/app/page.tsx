@@ -1,7 +1,18 @@
+'use client';
+
 import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { productsApi } from '@/lib/api';
+import { ProductCard } from '@/components/ProductCard';
 import { Button } from '@/components/ui/Button';
+import type { PaginatedProducts } from '@/types';
 
 export default function HomePage() {
+  const { data } = useQuery<PaginatedProducts>({
+    queryKey: ['featured-products'],
+    queryFn: () => productsApi.list({ limit: 4 }),
+  });
+
   return (
     <div>
       {/* Hero */}
@@ -38,6 +49,18 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Featured Products */}
+      {data?.products && data.products.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
+          <h2 className="mb-10 text-center text-2xl font-bold">Featured Products</h2>
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+            {data.products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
       <section className="bg-brand-50 py-20">

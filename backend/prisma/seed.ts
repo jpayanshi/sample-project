@@ -66,11 +66,16 @@ const PRODUCTS: ProductSeed[] = [
     price: 24.99,
     category: 'T-Shirts',
     images: ['/images/products/tshirts/tshirt-1.jpg'],
-    variants: makeVariants(
-      'TSH-OCT',
-      [{ name: 'Black', code: 'BLK' }, { name: 'White', code: 'WHT' }],
-      ['XS', 'S', 'M', 'L', 'XL'],
-    ),
+    variants: [
+      // XS + Black guaranteed stock:0 for the out-of-stock E2E test
+      { color: 'Black', size: 'XS', stock: 0,  sku: 'TSH-OCT-BLK-XS' },
+      { color: 'Black', size: 'S',  stock: 12, sku: 'TSH-OCT-BLK-S'  },
+      // M + Black guaranteed stock:15 for add-to-cart E2E tests
+      { color: 'Black', size: 'M',  stock: 15, sku: 'TSH-OCT-BLK-M'  },
+      { color: 'Black', size: 'L',  stock: 8,  sku: 'TSH-OCT-BLK-L'  },
+      { color: 'Black', size: 'XL', stock: 5,  sku: 'TSH-OCT-BLK-XL' },
+      ...makeVariants('TSH-OCT', [{ name: 'White', code: 'WHT' }], ['XS', 'S', 'M', 'L', 'XL']),
+    ],
   },
   {
     name: 'Slim Fit V-Neck Tee',

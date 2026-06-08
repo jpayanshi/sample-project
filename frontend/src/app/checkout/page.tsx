@@ -1,10 +1,9 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { cartApi, ordersApi } from '@/lib/api';
+import { authApi, cartApi, ordersApi } from '@/lib/api';
 import { checkoutSchema, type CheckoutFormValues } from '@/schemas';
 import { formatPrice } from '@/lib/utils';
 import { Input } from '@/components/ui/Input';
@@ -12,13 +11,15 @@ import { Button } from '@/components/ui/Button';
 import { useRouter } from 'next/navigation';
 import type { CartItem } from '@/types';
 
-// TODO: Import and initialise Stripe Elements here
-// import { loadStripe } from '@stripe/stripe-js';
-// import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-// const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-
 export default function CheckoutPage() {
   const router = useRouter();
+
+  const { data: authData, isLoading: authLoading } = useQuery({
+    queryKey: ['me'],
+    queryFn: authApi.me,
+    retry: false,
+  });
+
   const { data: cartData } = useQuery({ queryKey: ['cart'], queryFn: cartApi.get });
   const items: CartItem[] = cartData?.cart?.items ?? [];
 
@@ -33,8 +34,6 @@ export default function CheckoutPage() {
     formState: { errors },
   } = useForm<CheckoutFormValues>({ resolver: zodResolver(checkoutSchema) });
 
-  // TODO: After address form submission, create an order which returns a clientSecret,
-  // then display Stripe Elements <PaymentElement> for the user to enter card details.
   const orderMutation = useMutation({
     mutationFn: (addressId: string) => ordersApi.create(addressId),
     onSuccess: (data) => {
@@ -42,12 +41,14 @@ export default function CheckoutPage() {
     },
   });
 
+  // Auth guard — redirect unauthenticated users to login
+  if (authLoading) return <div className="py-20 text-center">Loading…</div>;
+  if (!authData?.user) {
+    router.push('/auth/login');
+    return null;
+  }
+
   const onSubmit = (_data: CheckoutFormValues) => {
-    // TODO:
-    // 1. POST the address to backend to get addressId
-    // 2. Call ordersApi.create(addressId) → get clientSecret
-    // 3. Confirm payment with Stripe Elements
-    // 4. On success redirect to /order-confirmation/:id
     alert('TODO: Wire up Stripe Elements. See comments in this file.');
   };
 
@@ -61,21 +62,24 @@ export default function CheckoutPage() {
           <h2 className="text-xl font-semibold">Shipping Address</h2>
 
           <Input
+            id="line1"
             label="Address Line 1"
             {...register('line1')}
             error={errors.line1?.message}
             placeholder="123 Main St"
           />
           <Input
+            id="line2"
             label="Address Line 2 (optional)"
             {...register('line2')}
             placeholder="Apt 4B"
           />
           <div className="grid grid-cols-2 gap-4">
-            <Input label="City" {...register('city')} error={errors.city?.message} />
-            <Input label="Postcode" {...register('postcode')} error={errors.postcode?.message} />
+            <Input id="city" label="City" {...register('city')} error={errors.city?.message} />
+            <Input id="postcode" label="Postcode" {...register('postcode')} error={errors.postcode?.message} />
           </div>
           <Input
+            id="country"
             label="Country"
             {...register('country')}
             error={errors.country?.message}
